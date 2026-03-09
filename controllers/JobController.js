@@ -823,3 +823,29 @@ exports.submitWork = async (req, res) => {
     });
   }
 };
+
+// ===============================
+// GET COMPLETED JOBS FOR CURRENT USER
+// ===============================
+
+exports.getCompletedJobsForUser = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    // Get completed jobs where user is either poster or tasker
+    const completedJobs = await Job.findCompletedJobsByUserId(userId);
+
+    res.json({
+      success: true,
+      jobs: completedJobs,
+      count: completedJobs.length,
+    });
+  } catch (error) {
+    console.error("getCompletedJobsForUser error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch completed jobs",
+      error: error.message,
+    });
+  }
+};

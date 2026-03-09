@@ -28,7 +28,7 @@ const getCookieConfig = () => ({
  */
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, repeatPassword } = req.body;
+    const { name, email, password, repeatPassword, role } = req.body;
 
     // Validation
     if (!name || !email || !password || !repeatPassword) {
@@ -52,6 +52,14 @@ exports.register = async (req, res) => {
       });
     }
 
+    // Validate role if provided
+    if (role && !["poster", "tasker"].includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: "Role tidak valid. Harus 'poster' atau 'tasker'",
+      });
+    }
+
     // Check existing user
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
@@ -66,6 +74,14 @@ exports.register = async (req, res) => {
 
     // Create user
     const result = await User.create(name, email, hashedPassword);
+
+    // If role is provided, update user's role
+    if (role) {
+      await User.updateRole(result.insertId, { role });
+    }
+
+    // Ensure user has a wallet after registration
+    await User.ensureWalletExists(result.insertId);
 
     res.status(201).json({
       success: true,
@@ -124,7 +140,7 @@ exports.login = async (req, res) => {
       process.env.JWT_SECRET,
       {
         expiresIn: process.env.JWT_EXPIRES_IN || "1h",
-      }
+      },
     );
 
     // Generate CSRF token
@@ -302,7 +318,10 @@ exports.forgotPassword = async (req, res) => {
     // Generate reset token
     const crypto = require("crypto");
     const resetToken = crypto.randomBytes(32).toString("hex");
-    const resetTokenHash = crypto.createHash("sha256").update(resetToken).digest("hex");
+    const resetTokenHash = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
     const resetTokenExpiry = new Date(Date.now() + 1 * 60 * 60 * 1000); // 1 hour
 
     // Store reset token in users table
@@ -311,7 +330,7 @@ exports.forgotPassword = async (req, res) => {
     try {
       await connection.execute(
         `UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?`,
-        [resetTokenHash, resetTokenExpiry, user.id]
+        [resetTokenHash, resetTokenExpiry, user.id],
       );
     } finally {
       connection.release();
@@ -319,13 +338,18 @@ exports.forgotPassword = async (req, res) => {
 
     // TODO: Send email with reset link
     // For now, return token in response (for development only)
-    console.log(`Password reset link: http://localhost:3000/reset-password/${resetToken}`);
+    console.log(
+      `Password reset link: http://localhost:3000/reset-password/${resetToken}`,
+    );
 
     res.json({
       success: true,
       message: "If that email exists, a password reset link will be sent",
       // Remove in production - only for development
-      resetLink: process.env.NODE_ENV === "development" ? `http://localhost:3000/reset-password/${resetToken}` : undefined,
+      resetLink:
+        process.env.NODE_ENV === "development"
+          ? `http://localhost:3000/reset-password/${resetToken}`
+          : undefined,
     });
   } catch (error) {
     console.error("forgotPassword error:", error);
@@ -353,14 +377,17 @@ exports.verifyResetToken = async (req, res) => {
     }
 
     const crypto = require("crypto");
-    const resetTokenHash = crypto.createHash("sha256").update(token).digest("hex");
+    const resetTokenHash = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
 
     const pool = require("../config/database");
     const connection = await pool.getConnection();
     try {
       const [rows] = await connection.execute(
         `SELECT id, email FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()`,
-        [resetTokenHash]
+        [resetTokenHash],
       );
 
       if (rows.length === 0) {
@@ -419,7 +446,10 @@ exports.resetPassword = async (req, res) => {
     }
 
     const crypto = require("crypto");
-    const resetTokenHash = crypto.createHash("sha256").update(token).digest("hex");
+    const resetTokenHash = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
 
     const pool = require("../config/database");
     const connection = await pool.getConnection();
@@ -427,7 +457,7 @@ exports.resetPassword = async (req, res) => {
       // Find user with valid reset token
       const [rows] = await connection.execute(
         `SELECT id FROM users WHERE reset_token = ? AND reset_token_expiry > NOW()`,
-        [resetTokenHash]
+        [resetTokenHash],
       );
 
       if (rows.length === 0) {
@@ -446,7 +476,7 @@ exports.resetPassword = async (req, res) => {
       // Update password and clear reset token
       await connection.execute(
         `UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE id = ?`,
-        [hashedPassword, userId]
+        [hashedPassword, userId],
       );
 
       res.json({

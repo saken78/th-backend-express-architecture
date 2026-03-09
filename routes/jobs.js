@@ -74,6 +74,14 @@ router.put(
   jobController.submitWork
 );
 
+// GET /api/jobs/completed - Get completed jobs for current user (All users)
+// MUST be before generic /:id route to avoid matching as /jobs/id
+router.get(
+  "/completed",
+  verifyToken,
+  jobController.getCompletedJobsForUser
+);
+
 // ✅ GENERIC ROUTES AFTER ALL SPECIFIC ROUTES
 
 // GET /api/jobs - List jobs with filters (All users)

@@ -275,6 +275,46 @@ class Job {
       connection.release();
     }
   }
+
+  static async findCompletedJobsByUserId(userId) {
+    const connection = await pool.getConnection();
+    try {
+      // Query to get completed jobs where user is either poster or tasker
+      const query = `
+        SELECT DISTINCT j.*,
+               u.name as poster_name,
+               c.name as category_name,
+               u.email as poster_email,
+               u.avatar as poster_avatar,
+               'poster' as role_in_job
+        FROM jobs j
+        LEFT JOIN users u ON j.poster_id = u.id
+        LEFT JOIN categories c ON j.category_id = c.id
+        WHERE j.status = 'completed' AND j.poster_id = ?
+
+        UNION
+
+        SELECT DISTINCT j.*,
+               u.name as poster_name,
+               c.name as category_name,
+               u.email as poster_email,
+               u.avatar as poster_avatar,
+               'tasker' as role_in_job
+        FROM jobs j
+        LEFT JOIN applications a ON j.id = a.job_id
+        LEFT JOIN users u ON j.poster_id = u.id
+        LEFT JOIN categories c ON j.category_id = c.id
+        WHERE j.status = 'completed'
+          AND a.tasker_id = ?
+          AND a.status = 'accepted'
+      `;
+
+      const [rows] = await connection.execute(query, [userId, userId]);
+      return rows;
+    } finally {
+      connection.release();
+    }
+  }
 }
 
 module.exports = Job;

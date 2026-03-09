@@ -1,12 +1,12 @@
 const pool = require("../config/database");
 
 class User {
-  static async create(name, email, password) {
+  static async create(name, email, password, role = null) {
     const connection = await pool.getConnection();
     try {
       const [result] = await connection.execute(
-        "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-        [name, email, password]
+        "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)",
+        [name, email, password, role]
       );
       return result;
     } finally {
