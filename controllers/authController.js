@@ -16,7 +16,7 @@ const {
  * Cookie configuration
  */
 const getCookieConfig = () => ({
-  httpOnly: true, // ✅ JavaScript tidak bisa akses
+  httpOnly: true, // JavaScript tidak bisa akses
   secure: process.env.NODE_ENV === "production", // ✅ HTTPS only di production
   sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax", // ✅ CSRF protection
   maxAge: 60 * 60 * 1000, // 1 hour
@@ -147,7 +147,7 @@ exports.login = async (req, res) => {
     const csrfToken = generateCSRFToken();
     storeCSRFToken(user.id, csrfToken);
 
-    // ✅ Set httpOnly cookie
+    // Set httpOnly cookie
     res.cookie("auth_token", token, getCookieConfig());
 
     // Return user data + CSRF token (BUKAN JWT token!)
