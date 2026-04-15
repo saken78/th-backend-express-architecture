@@ -6,64 +6,6 @@ TaskHub is a job marketplace backend API that connects task posters with taskers
 
 ![Project Architecture](./graph.png)
 
-## Tech Stack
-
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MySQL via Supabase
-- **Authentication**: JWT with HttpOnly cookies + CSRF protection
-- **File Upload**: Multer (local storage)
-- **Validation**: express-validator
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- MySQL database (Supabase)
-- npm or yarn
-
-### Installation
-
-```bash
-npm install
-```
-
-### Environment Variables
-
-Create `.env` file:
-
-```env
-PORT=5000
-NODE_ENV=development
-FRONTEND_URL=http://localhost:3000
-
-# Supabase
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_KEY=your_supabase_service_key
-
-# JWT
-JWT_SECRET=your_jwt_secret
-JWT_EXPIRES_IN=7d
-
-# Database
-DB_HOST=your_db_host
-DB_USER=your_db_user
-DB_PASSWORD=your_db_password
-DB_NAME=taskhub
-```
-
-### Running
-
-```bash
-# Development
-npm run dev
-
-# Production
-npm start
-```
-
 Server runs on `http://localhost:5000`
 
 ## API Endpoints
