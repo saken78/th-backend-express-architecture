@@ -1,3 +1,4 @@
+see for ts: https://github.com/taskhub-xixi/th-backend-nestjs
 # TaskHub Backend API
 
 TaskHub is a job marketplace backend API that connects task posters with taskers. Built with Express.js and Supabase (MySQL).
