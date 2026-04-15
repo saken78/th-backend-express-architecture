@@ -3,6 +3,9 @@ node_modules/
 .env.local
 .DS_Store
 .vercel
+.beads
+.opencode
+docs
 
 # Uploads (avatar images)
 uploads/
