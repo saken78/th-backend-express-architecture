@@ -15,13 +15,13 @@ router.post(
   "/profile/avatar",
   verifyToken,
   profileController.uploadAvatar, // ← multer
-  profileController.updateAvatar
+  profileController.updateAvatar,
 );
 
 // UPDATE role
 router.put("/role", verifyToken, profileController.updateRole);
 
-// ✅ Settings endpoints
+// Settings endpoints
 // GET settings
 router.get("/settings", verifyToken, profileController.getSettings);
 

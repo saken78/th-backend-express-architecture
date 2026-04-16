@@ -1,5 +1,5 @@
 /**
- * Express Server dengan HttpOnly Cookie Authentication
+ * Express HttpOnly Cookie Authentication
  */
 
 const express = require("express");
@@ -74,10 +74,10 @@ app.use("/api/payments", paymentRoutes);
 // Chat routes
 app.use("/api/chat", chatRoutes);
 
-// ✅ Support routes
+// Support routes
 app.use("/api/support", supportRoutes);
 
-// ✅ Category routes
+// Category routes
 app.use("/api/categories", categoryRoutes);
 
 // Health check
@@ -112,7 +112,7 @@ app.get("/", async (req, res) => {
     const users = await User.findAll();
     res.json({
       success: true,
-      message: "Daftar user yang sudah terdaftar",
+      message: "List of user",
       total: users.length,
       users: users,
     });
@@ -120,7 +120,7 @@ app.get("/", async (req, res) => {
     console.error("Error fetching users:", error);
     res.status(500).json({
       success: false,
-      message: "Gagal mengambil data user",
+      message: "Error fetching users",
       error: error.message,
     });
   }
@@ -158,12 +158,12 @@ if (require.main === module) {
 
   app.listen(PORT, () => {
     console.log("=".repeat(60));
-    console.log(`✅ Server running on http://localhost:${PORT}`);
-    console.log(`✅ Environment: ${process.env.NODE_ENV || "development"}`);
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
     console.log(
-      `✅ CORS enabled for: ${process.env.FRONTEND_URL || "http://localhost:3000"}`,
+      `CORS enabled for: ${process.env.FRONTEND_URL || "http://localhost:3000"}`,
     );
-    console.log(`✅ HttpOnly cookies enabled`);
+    console.log(`HttpOnly cookies enabled`);
     console.log("=".repeat(60));
     console.log("\n📚 Available Endpoints:");
     console.log("   Auth:");

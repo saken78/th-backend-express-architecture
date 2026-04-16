@@ -6,7 +6,7 @@ const { checkRole } = require("../middlewares/roleMiddleware");
 const {
   jobValidationRules,
   jobUpdateValidationRules,
-  handleValidationErrors
+  handleValidationErrors,
 } = require("../middlewares/validationMiddleware");
 
 const jobController = require("../controllers/JobController");
@@ -15,54 +15,42 @@ const jobController = require("../controllers/JobController");
 router.post(
   "/",
   verifyToken,
-  checkRole('poster'),
+  checkRole("poster"),
   jobValidationRules(),
   handleValidationErrors,
-  jobController.createJob
+  jobController.createJob,
 );
 
-// ✅ SPECIFIC ROUTES MUST BE BEFORE GENERIC /:id ROUTE
+// SPECIFIC ROUTES MUST BE BEFORE GENERIC /:id ROUTE
 
 // GET /api/jobs/my-jobs - Get jobs posted by current user (Poster only)
 // MUST be before /:id route to avoid matching as /jobs/id
 router.get(
   "/my-jobs",
   verifyToken,
-  checkRole('poster'),
-  jobController.getMyJobs
+  checkRole("poster"),
+  jobController.getMyJobs,
 );
 
 // GET /api/jobs/saved - Get saved/bookmarked jobs for current user (All users)
 // MUST be before /:id route to avoid matching as /jobs/id
-router.get(
-  "/saved",
-  verifyToken,
-  jobController.getSavedJobs
-);
+router.get("/saved", verifyToken, jobController.getSavedJobs);
 
 // POST /api/jobs/:id/save - Save a job to bookmarks (All users)
 // MUST be before generic PUT/DELETE /:id routes
-router.post(
-  "/:id/save",
-  verifyToken,
-  jobController.saveJob
-);
+router.post("/:id/save", verifyToken, jobController.saveJob);
 
 // DELETE /api/jobs/:id/save - Remove a job from bookmarks (All users)
 // MUST be before generic PUT/DELETE /:id routes
-router.delete(
-  "/:id/save",
-  verifyToken,
-  jobController.unsaveJob
-);
+router.delete("/:id/save", verifyToken, jobController.unsaveJob);
 
 // PUT /api/jobs/:id/complete - Complete job and process payment (Poster only)
 // MUST be before generic PUT /:id route
 router.put(
   "/:id/complete",
   verifyToken,
-  checkRole('poster'),
-  jobController.completeJob
+  checkRole("poster"),
+  jobController.completeJob,
 );
 
 // PUT /api/jobs/:id/submit-work - Submit work (Tasker only)
@@ -70,19 +58,15 @@ router.put(
 router.put(
   "/:id/submit-work",
   verifyToken,
-  checkRole('tasker'),
-  jobController.submitWork
+  checkRole("tasker"),
+  jobController.submitWork,
 );
 
 // GET /api/jobs/completed - Get completed jobs for current user (All users)
 // MUST be before generic /:id route to avoid matching as /jobs/id
-router.get(
-  "/completed",
-  verifyToken,
-  jobController.getCompletedJobsForUser
-);
+router.get("/completed", verifyToken, jobController.getCompletedJobsForUser);
 
-// ✅ GENERIC ROUTES AFTER ALL SPECIFIC ROUTES
+// GENERIC ROUTES AFTER ALL SPECIFIC ROUTES
 
 // GET /api/jobs - List jobs with filters (All users)
 router.get("/", jobController.getAllJobs);
@@ -91,18 +75,18 @@ router.get("/", jobController.getAllJobs);
 router.put(
   "/:id",
   verifyToken,
-  checkRole('poster'),
+  checkRole("poster"),
   jobUpdateValidationRules(),
   handleValidationErrors,
-  jobController.updateJob
+  jobController.updateJob,
 );
 
 // DELETE /api/jobs/:id - Delete job (Poster only)
 router.delete(
   "/:id",
   verifyToken,
-  checkRole('poster'),
-  jobController.deleteJob
+  checkRole("poster"),
+  jobController.deleteJob,
 );
 
 // GET /api/jobs/:id - Get job details (All users)
@@ -110,3 +94,4 @@ router.delete(
 router.get("/:id", jobController.getJobById);
 
 module.exports = router;
+
