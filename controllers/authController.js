@@ -1,5 +1,5 @@
 /**
- * Auth Controller dengan HttpOnly Cookie + CSRF Protection
+ * Auth Controller with HttpOnly Cookie + CSRF Protection
  */
 
 const bcrypt = require("bcryptjs");
@@ -16,11 +16,11 @@ const {
  * Cookie configuration
  */
 const getCookieConfig = () => ({
-  httpOnly: true, // JavaScript tidak bisa akses
-  secure: process.env.NODE_ENV === "production", // ✅ HTTPS only di production
-  sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax", // ✅ CSRF protection
+  httpOnly: true, // JavaScript cannot access
+  secure: process.env.NODE_ENV === "production", // HTTPS only in production
+  sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax", // CSRF protection
   maxAge: 60 * 60 * 1000, // 1 hour
-  path: "/", // Available untuk semua routes
+  path: "/", // Available for all routes
 });
 
 /**
@@ -34,21 +34,21 @@ exports.register = async (req, res) => {
     if (!name || !email || !password || !repeatPassword) {
       return res.status(400).json({
         success: false,
-        message: "Semua field harus diisi",
+        message: "All fields are required",
       });
     }
 
     if (password !== repeatPassword) {
       return res.status(400).json({
         success: false,
-        message: "Password tidak sama",
+        message: "Passwords do not match",
       });
     }
 
     if (password.length < 8) {
       return res.status(400).json({
         success: false,
-        message: "Password minimal 8 karakter",
+        message: "Password must be at least 8 characters",
       });
     }
 
@@ -56,7 +56,7 @@ exports.register = async (req, res) => {
     if (role && !["poster", "tasker"].includes(role)) {
       return res.status(400).json({
         success: false,
-        message: "Role tidak valid. Harus 'poster' atau 'tasker'",
+        message: "Invalid role. Must be 'poster' or 'tasker'",
       });
     }
 
@@ -65,7 +65,7 @@ exports.register = async (req, res) => {
     if (existingUser) {
       return res.status(409).json({
         success: false,
-        message: "Email sudah terdaftar",
+        message: "Email already registered",
       });
     }
 
@@ -85,21 +85,21 @@ exports.register = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "User berhasil didaftarkan",
+      message: "User registered successfully",
       userId: result.insertId,
     });
   } catch (error) {
     console.error("Register error:", error);
     res.status(500).json({
       success: false,
-      message: "Terjadi kesalahan saat registrasi",
+      message: "Registration failed",
       error: error.message,
     });
   }
 };
 
 /**
- * Login user dan set httpOnly cookie
+ * Login user and set httpOnly cookie
  */
 exports.login = async (req, res) => {
   try {
@@ -109,7 +109,7 @@ exports.login = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Email dan password harus diisi",
+        message: "Email and password are required",
       });
     }
 
@@ -118,7 +118,7 @@ exports.login = async (req, res) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "Email atau password salah",
+        message: "Invalid email or password",
       });
     }
 
@@ -127,7 +127,7 @@ exports.login = async (req, res) => {
     if (!isValidPassword) {
       return res.status(401).json({
         success: false,
-        message: "Email atau password salah",
+        message: "Invalid email or password",
       });
     }
 
@@ -153,7 +153,7 @@ exports.login = async (req, res) => {
     // Return user data + CSRF token (BUKAN JWT token!)
     res.json({
       success: true,
-      message: "Login berhasil",
+      message: "Login successful",
       user: {
         id: user.id,
         name: user.name,
@@ -171,14 +171,14 @@ exports.login = async (req, res) => {
     console.error("Login error:", error);
     res.status(500).json({
       success: false,
-      message: "Terjadi kesalahan saat login",
+      message: "Login failed",
       error: error.message,
     });
   }
 };
 
 /**
- * Logout user dan clear cookie
+ * Logout user and clear cookie
  * Uses optionalAuth - works even if token expired
  */
 exports.logout = async (req, res) => {
@@ -198,7 +198,7 @@ exports.logout = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Logout berhasil",
+      message: "Logout successful",
     });
   } catch (error) {
     console.error("Logout error:", error);
@@ -212,7 +212,7 @@ exports.logout = async (req, res) => {
     });
     res.json({
       success: true,
-      message: "Logout berhasil (cookie cleared)",
+      message: "Logout successful (cookie cleared)",
     });
   }
 };
@@ -248,7 +248,7 @@ exports.getCSRFToken = async (req, res) => {
     console.error("Get CSRF token error:", error);
     res.status(500).json({
       success: false,
-      message: "Terjadi kesalahan",
+      message: "An error occurred",
       error: error.message,
     });
   }
@@ -266,7 +266,7 @@ exports.me = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User tidak ditemukan",
+        message: "User not found",
       });
     }
 
@@ -283,7 +283,7 @@ exports.me = async (req, res) => {
     console.error("Get user error:", error);
     res.status(500).json({
       success: false,
-      message: "Terjadi kesalahan",
+      message: "An error occurred",
       error: error.message,
     });
   }
