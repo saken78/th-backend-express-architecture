@@ -1,6 +1,6 @@
 /**
  * Payment Method Controller
- * Untuk CRUD payment methods (kartu, bank, dll)
+ * CRUD for payment methods (cards, banks, etc)
  */
 
 const PaymentMethod = require("../models/PaymentMethod");
@@ -68,7 +68,15 @@ exports.getPaymentMethodById = async (req, res) => {
 exports.createPaymentMethod = async (req, res) => {
   try {
     const userId = req.userId;
-    const { type, card_number, card_holder, expiry_month, expiry_year, cvv, is_default } = req.body;
+    const {
+      type,
+      card_number,
+      card_holder,
+      expiry_month,
+      expiry_year,
+      cvv,
+      is_default,
+    } = req.body;
 
     // Validate required fields
     if (!type || !card_number || !card_holder) {

@@ -8,22 +8,22 @@ const getAvatarUrl = (avatarPath) => {
   if (!avatarPath) return null;
 
   // If already full URL, extract pathname
-  if (avatarPath.startsWith('http')) {
+  if (avatarPath.startsWith("http")) {
     try {
       const parsedUrl = new URL(avatarPath);
       avatarPath = parsedUrl.pathname;
     } catch (error) {
-      console.log(`Error parsing avatar URL:`, avatarPath, error)
+      console.log(`Error parsing avatar URL:`, avatarPath, error);
       return null;
     }
   }
 
-  if(!avatarPath.startsWith('/')) {
-    avatarPath = '/' + avatarPath;
+  if (!avatarPath.startsWith("/")) {
+    avatarPath = "/" + avatarPath;
   }
 
   // Add backend URL
-  const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000';
+  const backendUrl = process.env.BACKEND_URL || "http://localhost:5000";
   return `${backendUrl}${avatarPath}`;
 };
 
@@ -75,7 +75,7 @@ exports.getProfile = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User tidak ditemukan",
+        message: "User not found",
       });
     }
 
@@ -95,7 +95,7 @@ exports.getProfile = async (req, res) => {
     console.error("getProfile error:", error);
     res.status(500).json({
       success: false,
-      message: "Gagal mengambil profil",
+      message: "Failed to fetch profile",
       error: error.message,
     });
   }
@@ -117,12 +117,12 @@ exports.updateProfile = async (req, res) => {
     });
 
     // Debug: Log what we got from database
-    console.log('📝 Updated user from DB:', updatedUser);
+    console.log("Updated user from DB:", updatedUser);
 
     // Return profile in same format as getProfile
     res.json({
       success: true,
-      message: "Profil berhasil diperbarui",
+      message: "Profile updated successfully",
       profile: {
         email: updatedUser.email,
         firstName: updatedUser.firstName,
@@ -136,7 +136,7 @@ exports.updateProfile = async (req, res) => {
     console.error("updateProfile error:", error);
     res.status(500).json({
       success: false,
-      message: "Gagal memperbarui profil",
+      message: "Failed to update profile",
       error: error.message,
     });
   }
@@ -151,7 +151,7 @@ exports.updateAvatar = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: "Tidak ada file yang diupload",
+        message: "No file uploaded",
       });
     }
 
@@ -162,14 +162,14 @@ exports.updateAvatar = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Avatar berhasil diperbarui",
+      message: "Avatar updated successfully",
       avatarUrl: getAvatarUrl(filePath),
     });
   } catch (error) {
     console.error("updateAvatar error:", error);
     res.status(500).json({
       success: false,
-      message: "Gagal upload avatar",
+      message: "Failed to upload avatar",
       error: error.message,
     });
   }
@@ -181,10 +181,10 @@ exports.updateAvatar = async (req, res) => {
 
 exports.updateRole = async (req, res) => {
   try {
-    console.log('🔍 updateRole request received:', {
+    console.log("updateRole request received:", {
       body: req.body,
       userId: req.userId,
-      headers: req.headers
+      headers: req.headers,
     });
 
     const { role } = req.body;
@@ -193,30 +193,42 @@ exports.updateRole = async (req, res) => {
     const normalizedRole = role ? role.toLowerCase() : null;
 
     // Validate role
-    if (!normalizedRole || !['poster', 'tasker'].includes(normalizedRole)) {
-      console.log('❌ Invalid role received:', role, 'normalized to:', normalizedRole);
+    if (!normalizedRole || !["poster", "tasker"].includes(normalizedRole)) {
+      console.log(
+        "Invalid role received:",
+        role,
+        "normalized to:",
+        normalizedRole,
+      );
       return res.status(400).json({
         success: false,
-        message: "Role tidak valid. Gunakan 'poster' atau 'tasker'",
-        receivedRole: role
+        message: "Invalid role. Use 'poster' or 'tasker'",
+        receivedRole: role,
       });
     }
 
     // Use the normalized role for the update
-    const updatedUser = await User.updateRole(req.userId, { role: normalizedRole });
+    const updatedUser = await User.updateRole(req.userId, {
+      role: normalizedRole,
+    });
 
-    console.log('✅ Role updated successfully for user:', req.userId, 'to role:', normalizedRole);
+    console.log(
+      "Role updated successfully for user:",
+      req.userId,
+      "to role:",
+      normalizedRole,
+    );
 
     res.json({
       success: true,
-      message: "Role berhasil diperbarui",
+      message: "Role updated successfully",
       role: normalizedRole, // Return the normalized role
     });
   } catch (error) {
     console.error("updateRole error:", error);
     res.status(500).json({
       success: false,
-      message: "Gagal memperbarui role",
+      message: "Failed to update role",
       error: error.message,
     });
   }
@@ -261,7 +273,7 @@ exports.updateSettings = async (req, res) => {
     const settings = req.body;
 
     // Validate settings is an object
-    if (typeof settings !== 'object' || settings === null) {
+    if (typeof settings !== "object" || settings === null) {
       return res.status(400).json({
         success: false,
         message: "Settings must be an object",
@@ -294,7 +306,7 @@ exports.updateAppearance = async (req, res) => {
     const appearanceSettings = req.body;
 
     // Validate appearanceSettings is an object
-    if (typeof appearanceSettings !== 'object' || appearanceSettings === null) {
+    if (typeof appearanceSettings !== "object" || appearanceSettings === null) {
       return res.status(400).json({
         success: false,
         message: "Appearance settings must be an object",
@@ -309,9 +321,9 @@ exports.updateAppearance = async (req, res) => {
     const updatedSettings = {
       ...currentSettingsObj,
       appearance: {
-        ...((currentSettingsObj.appearance) || {}),
-        ...appearanceSettings
-      }
+        ...(currentSettingsObj.appearance || {}),
+        ...appearanceSettings,
+      },
     };
 
     const result = await User.updateSettings(req.userId, updatedSettings);
